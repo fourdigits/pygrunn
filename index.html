@@ -1,0 +1,1224 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Testing Django Applications</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/night.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/styles/a11y-dark.css">
+
+		<style>
+			* {
+				--r-heading-font: "Graphik", Montserrat, Impact, sans-serif;
+				--r-main-font: "Tiempos Text", Montserrat, Impact, sans-serif;
+				--r-heading-font-weight: bold;
+				--r-heading1-size: 1.5em;
+			}
+		</style>
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+	<script type="text/template">
+# Testing Django Applications
+
+!!! note
+
+**Kees**
+
+My name is Kees Hink and this is Coen van der Kamp.
+
+We'll speak about testing Django applications today.
+And give you some insights in how we test our Django applications.
+
+	</script>
+</section>
+
+<section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+# Why?
+
+!!! note
+
+You're here for a reason so probably you attended Dirk Nederveens talk.
+I will just say that it helps you to make sure that you don't accidentally break features.
+
+In this talk we'll dive into testing Django applications.
+		</script>
+	</section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note" data-background-image="http://localhost:8000/images/fourdigits.png" data-background-size="cover">
+
+		<script type="text/template">
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 34 100 72" class="logo__image" style="max-width: 30%">
+  <desc>Four Digits</desc>
+  <g fill="none" fill-rule="evenodd">
+    <path fill="#FFF" d="M149.995 34.188c-.638 0-1.237.246-1.69.69L129.15 53.813c-.93.92-.93 2.417 0 3.337.93.92 2.446.92 3.377 0l19.158-18.933c.932-.92.932-2.418 0-3.338-.45-.446-1.05-.692-1.688-.692M156.38 40.5c-.61 0-1.222.23-1.687.69l-19.16 18.932c-.93.92-.93 2.418 0 3.338.933.92 2.447.92 3.378 0l19.16-18.933c.93-.92.93-2.417 0-3.337-.466-.46-1.077-.69-1.69-.69M162.767 46.81c-.612 0-1.223.23-1.688.69l-19.16 18.933c-.93.92-.93 2.418 0 3.338.932.92 2.446.92 3.377 0l19.16-18.932c.93-.92.93-2.417 0-3.337-.467-.46-1.078-.69-1.69-.69"></path>
+    <path fill="#EDAA2C" d="M169.153 53.12c-.637 0-1.237.246-1.688.692l-19.16 18.932c-.93.92-.93 2.417 0 3.338.932.92 2.448.92 3.378 0l19.16-18.933c.45-.447.698-1.04.698-1.67 0-.63-.247-1.223-.698-1.668-.45-.446-1.05-.69-1.69-.69"></path>
+    <g fill="#FFF" id="logo-name">
+      <path d="M100.105 86.475h9.344v2.555h-6.047v3.802h4.784v2.454h-4.784v5.573h-3.298V86.474M118.01 95.67v-.142c0-2.012-.956-3.22-2.605-3.22-1.628 0-2.606 1.168-2.606 3.18v.16c0 2.012.936 3.22 2.605 3.22 1.65 0 2.606-1.208 2.606-3.2zm-8.223.04v-.162c0-3.3 2.422-5.452 5.618-5.452s5.598 2.113 5.598 5.39v.162c0 3.32-2.422 5.432-5.62 5.432-3.174 0-5.596-2.092-5.596-5.37zM122.54 97.117v-6.78h2.93v6.378c0 1.428.59 2.112 1.853 2.112 1.242 0 2.22-.765 2.22-2.314v-6.175h2.93v10.52h-2.93v-1.65c-.55 1.067-1.63 1.872-3.38 1.872-2.076 0-3.623-1.207-3.623-3.963M134.428 90.338h2.95v2.01c.673-1.407 1.71-2.15 3.442-2.17v2.715c-2.18-.02-3.44.683-3.44 2.695v5.27h-2.952V90.34M151.924 98.324c2.93 0 4.315-1.63 4.315-4.607v-.16c0-2.958-1.284-4.547-4.357-4.547h-1.303v9.314h1.344zm-4.642-11.85h4.764c5.11 0 7.633 2.737 7.633 7.042v.16c0 4.306-2.545 7.183-7.655 7.183h-4.743V86.474zM161.326 100.86h2.932V90.337h-2.932v10.52zm-.223-13.54c0-.905.732-1.59 1.67-1.59.955 0 1.688.685 1.688 1.59s-.732 1.59-1.688 1.59c-.937 0-1.67-.685-1.67-1.59zM174.004 95.327v-.14c0-1.792-.957-2.878-2.565-2.878-1.65 0-2.566 1.166-2.566 2.896v.16c0 1.75 1.038 2.837 2.504 2.837 1.547 0 2.626-1.086 2.626-2.876zm-8.06 5.753h2.93c.184.925.855 1.53 2.362 1.53 1.79 0 2.687-.927 2.687-2.576v-1.59c-.59 1.026-1.853 1.952-3.42 1.952-2.585 0-4.64-1.91-4.64-5.03v-.14c0-3.017 2.034-5.13 4.68-5.13 1.73 0 2.77.745 3.38 1.81V90.34h2.93v9.696c-.02 3.118-2.116 4.707-5.617 4.707-3.44 0-5.008-1.487-5.293-3.66zM178.9 100.86h2.933V90.337H178.9v10.52zm-.223-13.54c0-.905.733-1.59 1.67-1.59.956 0 1.69.685 1.69 1.59s-.734 1.59-1.69 1.59c-.937 0-1.67-.685-1.67-1.59zM184.648 97.74v-5.33h-1.364v-2.072h1.364v-2.273h2.93v2.273h2.24v2.072h-2.24v5.07c0 .844.43 1.246 1.182 1.246.448 0 .773-.06 1.12-.2v2.252c-.408.14-.998.282-1.792.282-2.24 0-3.44-1.127-3.44-3.32M190.765 97.56h2.748c.122.945.59 1.488 1.873 1.488 1.14 0 1.67-.422 1.67-1.147 0-.723-.632-1.025-2.16-1.246-2.828-.422-3.928-1.227-3.928-3.28 0-2.19 2.036-3.278 4.214-3.278 2.362 0 4.133.845 4.397 3.26h-2.708c-.163-.866-.652-1.268-1.67-1.268-.956 0-1.506.442-1.506 1.086 0 .664.51.925 2.056 1.147 2.667.383 4.133 1.047 4.133 3.3 0 2.273-1.67 3.46-4.48 3.46-2.87 0-4.54-1.247-4.64-3.52"></path>
+    </g>
+  </g>
+</svg>
+
+!!! note
+
+- Four Digits is a Python and Django development company based in Arnhem.
+- We make tailor made software applications.
+- We have 12 developers.
+
+- We work in teams, and often with different team members.
+- That's why we rely on tests to make sure we don't break things.
+- Also, that how we know how to test things in a way that everyone can understand.
+		</script>
+	</section>
+</section>
+
+<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+	<script type="text/template">
+# Why this talk?
+
+!!! note
+
+There is a lot of documentation.
+But for a beginning tester, it's hard to tell the forest from the trees.
+This talk is a better starting point than randomly searching the web.
+
+Also, this talk is a bit opinionated.
+On the web, you will get 100 opinions.
+Here you get one.
+This helps you get started.
+
+You might not agree with parts.
+This is a good thing, it means you also have experience to share. Speak up!
+
+The slides are available. They contain links to all resources we mention.
+	</script>
+</section>
+
+<section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+# Python [unittest](https://docs.python.org/3/library/unittest.html)
+
+!!! note
+
+**Coen**
+
+I'll start with the basics: Python standard library `unittest`.
+
+Unittest framework is part of Pythons standard library.
+It is used in a lot of Python software. This is not Django specific yet.
+
+`unittest` is the name test framework, but "Unit Test" is the category name for tests that test a single unit of code.
+
+It is a bit confusing name. Just understand that unittest framework has been the industry standard for testing Python applications for a long time.
+
+		</script>
+	</section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+```python
+def add(a, b):
+    return a + b
+```
+
+!!! note
+
+Here we have a simple Python function to add two values.
+
+It takes two arguments and returns the sum of them.
+		</script>
+	</section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+```python
+import unittest
+
+class TestAdd(unittest.TestCase):
+
+    def test_add(self):
+        self.assertEqual(add(4, 2), 6)
+```
+
+!!! note
+
+With unit tests we can test the `add` function.
+
+A test class allows you to group tests that belong to each other.
+		</script>
+	</section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+```bash
+$ python -m unittest
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+```
+
+!!! note
+
+Let's run the test with `python -m unittest`.
+
+`-m` is a flag to run a module as a script.
+
+Use `-h` to see all options.
+
+All files that start with `test_` are considered test modules. These tests will be executed.
+
+A successful test is presented as a dot.
+
+We see a summary of the test run: Ran 1 test. OK.
+
+When the test proces terminates, and all tests are a success. It returns code of NULL.
+
+		</script>
+	</section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+``` none
+$ python -m unittest
+F
+======================================================================
+FAIL: test_add (__main__.TestAdd)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/coen/test_add.py", line 10, in test_add
+    self.assertEqual(add(4, 2), 6)
+AssertionError: 42 != 6
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (failures=1)
+```
+
+!!! note
+
+This is an example of output of a failing test.
+
+An `F`, with a traceback.
+
+The process terminates with a return code of ONE.
+
+The termination codes ZERO and ONE tell your CI/CD pipeline to pass or fail.
+		</script>
+	</section>
+
+		<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+```python
+import unittest
+
+class TestAdd(unittest.TestCase):
+
+    def setUp(self):
+        ...
+
+    def tearDown(self):
+        ...
+```
+
+!!! note
+
+Each test have `setUp` and `tearDown` methods that are run before and after each test.
+
+You can use these to create test data that is needed for each test within the class.
+
+For example, you can create a temp directory in `setUp`, write files to it in tests, and remove the directory in `tearDown`.
+
+		</script>
+	</section>
+
+</section>
+
+<section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+# Django [TestCase](https://docs.djangoproject.com/en/5.0/topics/testing/overview/)
+
+!!! note
+The `DjangoTestCase` class extends `unittest.TestCase`. So Django uses the unittest framework under the hood.
+
+		</script>
+	</section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+``` python
+from django.test import TestCase
+
+
+class UserTests(TestCase):
+
+    def test_user_is_active(self):
+        user = User.objects.create_user(username="test")
+        self.assertTrue(user.is_active())
+```
+!!! note
+Here we have a simple test that creates a user and checks if the user is active.
+
+Note that Django has set up a test database. And it will roll back the database after each test, starting fresh.
+
+Django TestCase provides some other extra's. I'll quickly mention them. And some of them will be discussed later in this talk.
+
+Modify settings.
+
+Adds assertions:
+  - Callable raises a certain exception or warning
+  - Template has been used
+  - HTML fragments (explain)
+  - Same for XML, JSON, URLs
+		</script>
+	</section>
+
+</section>
+
+<section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+# Testing a view
+
+Using [DjangoTestClient](https://docs.djangoproject.com/en/5.0/topics/testing/tools/#the-test-client)
+
+```python
+class QuestionIndexViewTests(TestCase):
+	def test_no_questions(self):
+		response = self.client.get(reverse("polls:index"))
+		self.assertEqual(response.status_code, 200)
+```
+
+!!! note
+
+As you see:
+
+- A Client to simulate requests. Think of a client as "a browser".
+- We test that the view works
+- We can also test the template rendering and context directly:
+```python
+		self.assertContains(
+			response, "No polls are available."
+		)
+		self.assertQuerySetEqual(
+			response.context["latest_question_list"], []
+		)
+```
+
+		</script>
+	</section>
+
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Testing as a specific user
+
+```python
+class AdminViewTests(TestCase):
+	def test_admin_has_access(self):
+		admin = User.objects.create_user(is_superuser=True)
+		self.client.force_login(admin)
+		response = self.client.get(reverse("polls:secret"))
+```
+
+!!! note
+- Here we test that an admin user can see the view
+- You will also test that a regular user can NOT log in.
+		</script>
+	</section>
+
+<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+	<script type="text/template">
+
+# Django [Tutorial Part 5](https://docs.djangoproject.com/en/5.0/intro/tutorial05/)
+
+!!! note
+
+So far, I've talked about Python Unittest and Django's testing tools. No additional libraries.
+
+Wrapping up this section, I'd like to mention Django tutorial part 5 as a starting point.
+
+	</script>
+</section>
+
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Django [Testing tools](https://docs.djangoproject.com/en/stable/topics/testing/tools/)
+
+!!! note
+
+I'd also like to point to the topic page about **testing tools** in the Django documentation.
+
+Most topics we showed are covered there.
+
+		</script>
+	</section>
+</section>
+
+<section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# The [pytest](https://docs.pytest.org/) runner
+
+!!! note
+**Kees**
+- The talk is already getting opinionated
+- We like pytest better, because it's easier to read
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+```python
+def test_add():
+	assert add(4, 2) == 6
+```
+
+!!! note
+- It makes assert statements shorter and arguably easier to read
+
+		</script>
+	</section>
+
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+```python
+class TestAdd(unittest.TestCase):
+
+    def test_add(self):
+        self.assertEqual(add(4, 2), 6)
+```
+
+!!! note
+- Compare with DjangoTestCase syntax
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Pytest plugins
+
+!!! note
+- There are several plugins available for pytest
+- For example: Integration with black (for codestyle), coverage (for, well, coverage) and... for Django
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# [pytest-django](https://pytest-django.readthedocs.io/)
+
+!!! note
+- pytest-django is a pytest plugin for Django
+- it gives us Django-specific fixtures
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# pytest-django fixtures
+
+```python
+def test_admin_user_is_superuser(admin_user):
+	assert admin_user.is_superuser is True
+```
+!!! note
+- pytest is not mentioned in testing section of the Django docs.
+- In fact it's mentioned only once, in the howto/upgrade-version section
+- But we like it, because it's easier to read and write
+- admin_user is a fixture (which is given by pytest-django)
+
+Note, Pytest also executes your Django Webtests.
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+# Custom pytest fixtures
+
+```python
+def test_homepage_order_count(client, user_with_orders):
+	client.force_login(user_with_orders)
+	homepage = client.get(reverse("index"))
+	assert "You have 10 orders" in response.content.decode()
+```
+
+!!! note
+- Here we test that the homepage shows the number of orders a user has
+- Define your own fixtures, like `user_with_orders`, in a file called `conftest.py`
+- They are automatically discovered
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Pytest options
+
+```bash
+$ pytest --pdb # drop into debugger on failure
+$ pytest -x # stop on first failure
+$ pytest --lf # run last failed test(s)
+```
+!!! note
+- follow the bullets
+- `-k` and `-x` are explained later
+		</script>
+	</section>
+
+</section>
+
+<section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# [django-webtest](https://github.com/django-webtest/django-webtest)
+
+!!! note
+- With Django test client: Cumbersome to create POST.
+- We use django-webtest
+- This gives us a different test client that is easier to use, called `django_app`
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Testing form submissions
+
+```python
+def test_submit_name(django_app):
+	page = django_app.get(reverse("add_name"))
+	form = page.form
+	form["name"] = "My name"
+	result_page = form.submit().follow()
+	assert Name.objects.last().name == "My name"
+```
+
+!!! note
+- Here we test that the "submit your name" form works.
+- With Django test client: Cumbersome to create POST.
+- We use django-webtest
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Checking the response
+
+```python
+def test_homepage_order_count(django_app, user_with_orders):
+	homepage = client.get(
+		reverse("index"), user=user_with_orders
+	)
+	assert "You have 10 orders" in response
+```
+!!! note
+- Here we test that the homepage shows how many orders a user has
+- Checking the response contents is easier with django-webtest
+- Compare this with three slides back: no `.content.decode()`
+		</script>
+	</section>
+
+</section>
+
+<section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# [factoryboy](https://factoryboy.readthedocs.io/)
+!!! note
+**Coen**
+
+Setting up testing content can be cumbersome.
+
+Many or complex objects.
+
+1. Django ORM to create objects
+
+2. Django has [fixture loading](https://docs.djangoproject.com/en/5.0/topics/testing/tools/#fixture-loading).
+
+Then you create date, export it to a fixture JSON file. And load it in your test.
+
+This is cumbersome, hard to debug and maintain.
+
+We love to write Python code, so we use Factory Boy.
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+```python
+class UserFactory(factory.django.DjangoModelFactory):
+    first_name = 'John'
+    last_name = 'Doe'
+
+    class Meta:
+        model = models.User
+```
+!!! note
+
+By defining factories smartly, you can set up complex objects easily.
+
+Explain
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+``` python
+user = UserFactory()
+user = UserFactory(name="Jane")
+many_users = UserFactory.create_batch(10)
+
+```
+!!! note
+
+Saved instance
+
+Override fields
+
+Create many
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+``` python
+from pytest_factoryboy import register
+
+register(UserFactory)
+```
+
+``` python
+def some_test(user, user_factory):
+    ...
+```
+
+!!! note
+
+It is possible to register factories. This makes them available as fixtures.
+
+Pytest will automatically use the factory to create an instance of the model.
+
+And call the test with the expected arguments.
+
+Although this seems a clean syntax, it is also a bit magic.
+
+Your IDE will not know what `user` or `user_factory` is. And you can't jump to the definitions.
+
+		</script>
+	</section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+``` python
+from factories import UserFactory
+
+def some_test():
+    user = UserFactory()
+```
+
+!!! note
+
+At Four Digits we prefer the more verbose syntax, where you explicitly import the factory and call it in the test.
+
+Your IDE will know what `UserFactory` is. And you can jump to the definition of `UserFactory`.
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+``` bash
+pytest --fixtures
+```
+
+!!! note
+List all fixtures with `pytest --fixtures`.
+
+Fixtures provided by pytest, pytest-plugins, and your own registred fixtures are listed.
+
+This command might help you understand what fixtures are available and where they are defined.
+		</script>
+	</section>
+
+</section>
+
+<section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# [Mocking](https://mock.readthedocs.io/en/latest/)
+
+```python
+def test_submit_send_email(django_app, mocker):
+    mocked_send = mocker.patch("myapp.utils.send_email")
+	...
+	result_page = form.submit().follow()
+	mocked_send.assert_called_once()
+```
+!!! note
+
+Let's say, you have a form in your project, and on submit, it should send an email.
+
+We set up a fake ("mock") `send_email` method
+
+`mocker.patch` means that method is replaced and will do nothing.
+
+The `mocker` pytest fixture comes from the [pytest-mock](https://github.com/pytest-dev/pytest-mock/) plugin.
+
+However, we can check if it was called with `assert_called_once()`.
+
+We can also check other things like the arguments it was called with.
+
+This allows you to test your application without actually sending emails.
+
+And this is just one example of mocking. You'd use mocking for all kinds of things, like external APIs.
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Testing external APIs
+
+```python
+def test_endpoint_list_success(mocked_responses):
+	client = ApiClientFactory()
+	mocked_responses.post(
+		"https://example.com/Account/GetList",
+		json={"hello": "world"},
+	)
+	assert client.account.get_list() == {"hello": "world"}
+```
+!!! note
+**Kees**
+
+Here we mock an API response.
+
+Ofcourse we don't want the API call to actually call to the external service.
+
+The trick is, to make 'contact points' to external services as small as possible.
+
+This allows you to test the most of your application. And only mock the contact points with the external service.
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Our mocked_responses
+
+We use [getsentry/responses](https://github.com/getsentry/responses):
+
+```python
+@pytest.fixture
+def mocked_responses():
+	with responses.RequestsMock() as rsps:
+		yield rsps
+```
+!!! note
+- There's also [requests-mock](https://requests-mock.readthedocs.io/), which is also fine.
+
+		</script>
+	</section>
+</section>
+
+<section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Testing your own API
+
+```python
+def test_api_order_list_data(api_client):
+	order = OrderFactory()
+	response = api_client.get(order_list_url)
+	assert response.status_code == HTTPStatus.OK
+	data = response.json()
+	assert data["count"] == 1
+```
+
+!!! note
+- Here we test the data returned by the "order list" endpoint
+- Here we use the [DRF test client](https://www.django-rest-framework.org/api-guide/testing/)
+- Compared to the Django test client, it has some nice API-specific features like `.json()`
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Our api_client fixture
+
+DRF's [APIClient](https://www.django-rest-framework.org/api-guide/testing/#apiclient)
+
+```python
+@pytest.fixture
+def api_client():
+    client = APIClient()
+    user = UserFactory()
+    Token.objects.create(user=user, key="token_key")
+    client.credentials(
+		HTTP_AUTHORIZATION="Token " + "token_key"
+	)
+    return client
+```
+
+!!! note
+**Kees**
+- This is how we create our api_client fixture.
+- It uses DRF's APIClient
+		</script>
+	</section>
+
+</section>
+
+<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+	<script type="text/template">
+
+# Testing mail
+
+```python
+def test_notify_new_order_submitted_mail(mailoutbox):
+    order = OrderFactory()
+    notify_new_order_submitted(order)
+    assert len(mailoutbox) == 1
+```
+!!! note
+- Here we test the notify_new_order_submitted() method.
+- Here we use the [mailoutbox](https://pytest-django.readthedocs.io/en/latest/helpers.html#mailoutbox) fixture
+- It's a wrapper around [django.core.mail.outbox](https://docs.djangoproject.com/en/5.0/topics/email/#in-memory-backend)
+	</script>
+</section>
+
+<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+	<script type="text/template">
+
+# Run test with varying data
+
+[parametrize](https://docs.pytest.org/en/7.1.x/how-to/parametrize.html)
+
+```python
+from myapp.utils import translate
+
+@pytest.mark.parametrize(
+    "value, expected_result",
+    [
+        (True, "Ja"),
+        (False, "Nee"),
+    ],
+)
+def test_translate(value, expected_result):
+    assert translate(value) == expected_result
+```
+!!! note
+
+- Here we test that booleans are translated into Dutch by our `translate()` method.
+	</script>
+</section>
+
+
+<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+	<script type="text/template">
+
+# Count queries
+
+[django_assert_num_queries](https://pytest-django.readthedocs.io/en/latest/helpers.html#django-assert-num-queries)
+
+```python
+def test_order_list_queries(
+	django_app, django_assert_num_queries
+):
+	owner = OrderFactory().owner
+    with django_assert_num_queries(20):
+        django_app.get(reverse("order_list"), user=owner)
+```
+!!! note
+
+- Here we test the number of SQL queries done by the order list view
+- And then you use this with parametrization for different amounts of orders
+	</script>
+</section>
+
+<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+	<script type="text/template">
+
+# Go back in time (or forward)
+
+[freezegun](https://github.com/spulec/freezegun) /
+[pytest-freezegun](https://github.com/ktosiek/pytest-freezegun)
+
+```bash
+pip install pytest-freezegun
+```
+
+```python
+@pytest.mark.freeze_time("1955-11-05")
+def test_current_year():
+	assert datetime.now().year == 1955
+```
+!!! note
+- And then you use this with parametrization for different amounts of orders
+	</script>
+</section>
+
+<section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Rules of thumb
+
+!!! note
+**Kees**
+
+- You could also call this: pitfalls
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Write readable tests
+
+!!! note
+
+- Tests are written once, but read many times, when they fail.
+- It helps if there's a clear message for what a test is trying to achieve.
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Assert with default assertion message
+
+```python
+assert Order.objects.for_user(henk).count() == 4
+```
+
+```text
+E       AssertionError: assert 3 == 4
+E 	     + where 0 = Order.objects.for_user(<Henk>).count()
+```
+
+
+!!! note
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Assert with [custom assertion message](https://docs.pytest.org/en/7.1.x/how-to/assert.html)
+
+```python
+assert (
+	Order.objects.for_user(henk).count() == 4
+), "Henk should not see archived orders"
+```
+
+```text
+E       AssertionError: Henk should not see archived orders
+E       assert 3 == 4
+E        +  where 3 = Order.objects.for_user(<Henk>).count()
+```
+
+!!! note
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Use comments
+
+!!! note
+
+- Just as you would in code
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+```python
+def test_view_documentation_success(
+    django_app, tmp_path, settings
+):
+    # Create a dummy file in a tmp dir, so this test
+	# does not depend on generated HTML files.
+    index_file = tmp_path / "index.html"
+    index_file.write_text("Hoeba")
+
+    # Allow django-sendfile2 to send it
+    settings.OMS_DOCS_BUILD_DIR = tmp_path
+    settings.SENDFILE_ROOT = tmp_path
+```
+
+!!! note
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Use docstrings
+
+!!! note
+
+- In our code examples we removed docstrings for brevity.
+- But they can help a lot to understand quickly what a test does.
+- Remember, you write this for someone who isn't familiar with the codebase (like you, in a few months)
+- Use this if the test name and assertion message still need more explanation.
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+```python
+def test_notify_new_orderlines_submitted_normal(mailoutbox):
+    """Test the e-mail sent to Servicebureau.
+
+	The mail is sent when new orderlines are submitted.
+
+    In this test, it's a non-V&H order (so "normal"),
+	so there should be no section about venh_additional_info.
+    """
+```
+
+!!! note
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Keep it simple
+
+!!! note
+
+- If you feel you have to write a lot of code to test something, it may not be the right direction
+- Talk about it with someone
+- Testing with real data, in a real database
+- Including "if TESTING: do this" in your code
+- Modifying your code to make it testable
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Adapting code to test it?
+
+!!! note
+- Anything that you can factor out into a function (instead of a method) is a win
+- But other than that, you shouldn't have to adapt your code to make it testable
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Testing code internals?
+
+!!! note
+- Ideally your tests don't depend on the internal workings of your code.
+- They should test the public API of your code, or what the user sees.
+- That's we write a lot of tests for views.
+- But that said, if you have some internal classes / model methods that contain important business logic: Test them.
+		</script>
+	</section>
+
+</section>
+
+<section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Coverage with [pytest-cov](https://github.com/pytest-dev/pytest-cov)
+
+```bash
+$ pip install pytest-cov
+$ pytest --cov=myapp
+```
+
+!!! note
+**Coen**
+- pytest-cov is a plugin for pytest
+- Here are some next steps
+- use it in MR's (coverage visualisation in GitLab)
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Coverage report
+
+![Coverage](images/coverage.png)
+
+!!! note
+- use it in MR's (coverage visualisation in GitLab)
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Run tests in CI
+
+```yaml
+# .gitlab-ci.yml
+test:
+  stage: test
+  script:
+    - pytest --cov-report term
+```
+
+!!! note
+- This is not strictly a Django thing, but remember: tests are useless unless you run them
+- The example is for Gitlab, but you can also use Github, Bitbucket, Jenkins, etc.
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+# Tagging and naming tests
+
+```bash
+$ pytest -k view_homepage
+```
+
+!!! note
+- You want to be able to run all tests related to a specific feature
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+       <script type="text/template">
+
+# Speed it up
+
+[pytest-xdist](https://github.com/pytest-dev/pytest-xdist)
+
+```bash
+$ pip install pytest-xdist
+$ pytest -x
+```
+
+!!! note
+- pytest-xdist is a plugin for pytest
+- Running in parallel can speed it up if you have many tests
+
+	   </script>
+	</section>
+
+</section>
+
+<section>
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+		<script type="text/template">
+
+[github.com/fourdigits/pygrunn](https://github.com/fourdigits/pygrunn)
+
+!!! note
+**Coen**
+
+The slides are available Github: fourdigits/pygrunn.
+
+They contain links to all resources we have mentioned.
+
+To wrap up: Test your Django application with:
+
+- Pytest
+- Django-webtest
+- Use the client to make requests
+- Create factories and fixtures with Factory Boy
+
+I hope we have given you a good starting point for testing your Django application.
+
+This is Kees and my name is Coen.
+
+Happy testing.
+
+
+		</script>
+	</section>
+
+	<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+			<script type="text/template">
+# 👋
+			</script>
+	</section>
+</section>
+
+<!-- Copy to create new slides
+<section data-markdown data-separator="^\n\n\n" data-separator-vertical="^\n\n\n"  data-separator-notes="!!! note">
+	<script type="text/template">
+
+#
+
+!!! note
+
+	</script>
+</section>
+-->
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
